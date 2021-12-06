@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -12,12 +13,24 @@ namespace FileUpdater
         {
             InitializeComponent();
         }
- 
+
         private async void Form1_Shown(object sender, EventArgs e)
         {
-            Updater updater = new Updater(progressBar);
-            BarSetting(updater.getFilesCout());
-            updater.Updating();
+            Updater updater;
+            try
+            {
+                updater = new Updater(progressBar);
+                BarSetting(updater.getFilesCout());
+                updater.Updating();
+            }
+            catch (DirectoryNotFoundException)
+            {
+                MessageBox.Show("Asd!");
+            }
+            catch (ArgumentException)
+            {
+                MessageBox.Show("asdaw11!");
+            }
             await Task.Delay(1000);
             Close();
         }
@@ -28,6 +41,6 @@ namespace FileUpdater
             progressBar.Minimum = 0;
             progressBar.Step = filesCount / 100;
             progressBar.Style = ProgressBarStyle.Continuous;
-        } 
+        }
     }
 }

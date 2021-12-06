@@ -10,15 +10,31 @@ namespace FileUpdater
     class Updater
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
-        private static IniFile MyIni = new IniFile(@"..\..\data\Folders.ini");
-        private static string folderToUpdate = MyIni.Read("FolderToUpdate");
-        private static string updatedFolder = MyIni.Read("UpdatedFolder");
-        private static string[] updatedFiles = Directory.GetFiles(updatedFolder);
-        private int filesCount = updatedFiles.Length;
+        private IniFile MyIni;
+        private string folderToUpdate;
+        private string updatedFolder;
+        private string[] updatedFiles;
+        private int filesCount;
         private ProgressBar progressBar;
 
         public Updater(ProgressBar progressBar)
         {
+            this.MyIni = new IniFile(@"..\..\data\Folders.ini");
+            try
+            {
+                this.folderToUpdate = MyIni.Read("FolderToUpdate");
+                this.updatedFolder = MyIni.Read("UpdatedFolder");
+                this.updatedFiles = Directory.GetFiles(updatedFolder);
+            }
+            catch (DirectoryNotFoundException)
+            {
+                throw;
+            }
+            catch(ArgumentException)
+            {
+                throw;
+            }
+            this.filesCount = updatedFiles.Length;
             this.progressBar = progressBar;
         }
 
@@ -91,7 +107,7 @@ namespace FileUpdater
 
                 if (File.Exists(fileToUpdatePath))
                 {
-                    if (isApplication(fileName))// Если это приложение
+                    if (isApplication(fileName))
                     {
                         string processName = Path.GetFileNameWithoutExtension(fileName);
                         if (isProcessExist(processName))

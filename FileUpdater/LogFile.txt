@@ -1,0 +1,7 @@
+2021-12-07 01:47:02.6036 INFO Message: The FileUpdater application was closed.
+2021-12-07 01:47:02.6295 INFO Message: File table1.xlsx is up to date.
+2021-12-07 01:47:42.0860 INFO Message: File file3.txt is up to date.
+2021-12-07 01:47:42.1309 INFO Message: The FileUpdater application was closed.
+2021-12-07 01:48:17.4204 INFO Message: File file3.txt is up to date.
+2021-12-07 01:53:17.7587 ERROR Message: Failed to update the table1.xlsx file.
+2021-12-07 01:53:50.9731 ERROR Message: Failed to update the table1.xlsx file.
