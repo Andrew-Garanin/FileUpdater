@@ -29,34 +29,34 @@ namespace FileUpdater
         /// </summary>
         private void InitializeComponent()
         {
-            this.progressBar1 = new System.Windows.Forms.ProgressBar();
-            this.label1 = new System.Windows.Forms.Label();
+            this.progressBar = new System.Windows.Forms.ProgressBar();
+            this.labelUpdating = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
-            // progressBar1
+            // progressBar
             // 
-            this.progressBar1.Location = new System.Drawing.Point(12, 53);
-            this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(442, 16);
-            this.progressBar1.TabIndex = 2;
+            this.progressBar.Location = new System.Drawing.Point(12, 53);
+            this.progressBar.Name = "progressBar";
+            this.progressBar.Size = new System.Drawing.Size(442, 16);
+            this.progressBar.TabIndex = 2;
             // 
-            // label1
+            // labelUpdating
             // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label1.Location = new System.Drawing.Point(186, 19);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(97, 22);
-            this.label1.TabIndex = 3;
-            this.label1.Text = "Updating...";
+            this.labelUpdating.AutoSize = true;
+            this.labelUpdating.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.labelUpdating.Location = new System.Drawing.Point(186, 19);
+            this.labelUpdating.Name = "labelUpdating";
+            this.labelUpdating.Size = new System.Drawing.Size(97, 22);
+            this.labelUpdating.TabIndex = 3;
+            this.labelUpdating.Text = "Updating...";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(466, 97);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.progressBar1);
+            this.Controls.Add(this.labelUpdating);
+            this.Controls.Add(this.progressBar);
             this.Name = "Form1";
             this.Text = "Updating Files";
             this.Shown += new System.EventHandler(this.Form1_Shown);
@@ -66,8 +66,8 @@ namespace FileUpdater
         }
 
         #endregion
-        private System.Windows.Forms.ProgressBar progressBar1;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.ProgressBar progressBar;
+        private System.Windows.Forms.Label labelUpdating;
     }
 }
 

@@ -1,2 +1,0 @@
-2021-12-05 20:31:27.0378 INFO Message: File Новый текстовый документ.txt added to the FolderToUpdate folder.
-2021-12-05 20:33:29.3547 INFO Message: File Новый текстовый документ.txt added to the FolderToUpdate folder.
