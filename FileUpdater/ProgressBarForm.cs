@@ -8,7 +8,6 @@ namespace FileUpdater
 {
     public partial class ProgressBarForm : Form, IProgressBar
     {
-
         public ProgressBarForm()
         {
             InitializeComponent();
@@ -25,16 +24,16 @@ namespace FileUpdater
             catch (DirectoryNotFoundException)
             {
                 MessageBox.Show("Directory not found.",
-                              "Updating files",
-                              MessageBoxButtons.OK,
-                              MessageBoxIcon.Error);
+                                "Updating files",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
             }
             catch (ArgumentException)
             {
                 MessageBox.Show("Directory path not specified.",
-                              "Updating files",
-                              MessageBoxButtons.OK,
-                              MessageBoxIcon.Error);
+                                "Updating files",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
             }
             await Task.Delay(1000);
             Close();

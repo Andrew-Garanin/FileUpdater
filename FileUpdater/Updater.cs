@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Linq;
-using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
 
@@ -9,7 +7,6 @@ namespace FileUpdater
 {
     class Updater
     {
-        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         private IniFile iniFile;
         private string folderToUpdate;
         private string updatedFolder;
@@ -19,7 +16,7 @@ namespace FileUpdater
 
         public Updater(IProgressBar progressBar)
         {
-            this.iniFile = new IniFile(@"..\..\data\Folders.ini");
+            this.iniFile = new IniFile(@"..\..\configuration\FoldersConfiguration.ini");
             try
             {
                 this.folderToUpdate = iniFile.Read("FolderToUpdate");
@@ -46,42 +43,82 @@ namespace FileUpdater
             return false;
         }
 
-        private bool IsProcessExist(string processName)
-        {
-            if (Process.GetProcesses().Any(p => p.ProcessName == processName))
-                return true;
-            return false;
-        }
-
         private string GenerateTempFileName(string fileName)
         {
             string fileExtension = Path.GetExtension(fileName);
-            return String.Format(@"{0}" + fileExtension, System.Guid.NewGuid());
+            return $"{System.Guid.NewGuid()}{fileExtension}";
         }
 
-        private void CloseProcess(string processName)
+        private string GetUniqueFilePath(string fileName)
         {
-            Process[] processes = Process.GetProcessesByName(processName);
-            bool wasClosed = false;
-            foreach (Process process in processes)
+            string tempFilePath = Path.Combine(folderToUpdate, GenerateTempFileName(fileName));
+            while (File.Exists(tempFilePath)) // Генерируем новое имя до тех пор, пока оно не будет уникальным
+                tempFilePath = Path.Combine(folderToUpdate, GenerateTempFileName(fileName));
+            return tempFilePath;
+        }
+
+        private void FailedToUpdateFileMsgBox(string fileName)
+        {
+            MessageBox.Show($"Failed to update the {fileName} file.",
+                            "Updating files",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Error);
+        }
+
+        private void UpdateFile(string fileName)
+        {
+            string fileToUpdatePath = Path.Combine(folderToUpdate, fileName);
+            string updatedFilePath = Path.Combine(updatedFolder, fileName);
+
+            if (File.Exists(fileToUpdatePath))
             {
-                if (process.CloseMainWindow())
+                if (IsApplication(fileName))
                 {
-                    wasClosed = true;
-                    Logger.Info("The " + processName + " application was closed.");
-                    break;
+                    string processName = Path.GetFileNameWithoutExtension(fileName);
+                    if (ProcessManager.IsProcessExist(processName))
+                        ProcessManager.CloseProcess(processName);
+                }
+
+                DateTime updatedFileLastWriteTime = File.GetLastWriteTime(updatedFilePath);
+                DateTime fileToUpdateLastWriteTime = File.GetLastWriteTime(fileToUpdatePath);
+
+                if (updatedFileLastWriteTime.CompareTo(fileToUpdateLastWriteTime) > 0) // файл требуется обновить
+                {
+                    string tempFilePath = GetUniqueFilePath(fileName);
+                    File.Copy(fileToUpdatePath, tempFilePath); // Резервная копия файла в папке для обновления
+                    try
+                    {
+                        File.Delete(fileToUpdatePath);
+                    }
+                    catch (IOException)
+                    {
+                        File.Delete(tempFilePath);
+                        FailedToUpdateFileMsgBox(fileName);
+                        Logger.WriteError($"Failed to update the {fileName} file.");
+                        return;
+                    }
+
+                    try
+                    {
+                        File.Copy(updatedFilePath, fileToUpdatePath);
+                    }
+                    catch (IOException)
+                    {
+                        File.Move(tempFilePath, fileToUpdatePath);
+                        FailedToUpdateFileMsgBox(fileName);
+                        Logger.WriteError($"Failed to update the {fileName} file.");
+                        return;
+                    }
+
+                    File.Delete(tempFilePath);
+                    Logger.WriteInfo($"File {fileName} is up to date.");
                 }
             }
-            if (!wasClosed)
-                Logger.Error("Faild to close the " + processName + " application.");
-        }
-
-        private void FaildToUpdateFileMsgBox(string fileName)
-        {
-            MessageBox.Show("Failed to update the " + fileName + " file.",
-                               "Updating files",
-                               MessageBoxButtons.OK,
-                               MessageBoxIcon.Error);
+            else
+            {
+                File.Copy(updatedFilePath, fileToUpdatePath);
+                Logger.WriteInfo($"File {fileName} added to the FolderToUpdate folder.");
+            }
         }
 
         public void UpdateFiles()
@@ -98,61 +135,7 @@ namespace FileUpdater
             for (int i = 0; i < filesCount; i++)
             {
                 string fileName = Path.GetFileName(updatedFiles[i]);
-                string fileToUpdatePath = Path.Combine(folderToUpdate, fileName);
-                string updatedFilePath = Path.Combine(updatedFolder, fileName);
-
-                if (File.Exists(fileToUpdatePath))
-                {
-                    if (IsApplication(fileName))
-                    {
-                        string processName = Path.GetFileNameWithoutExtension(fileName);
-                        if (IsProcessExist(processName))
-                            CloseProcess(processName);
-                    }
-
-                    DateTime updatedFileLastWriteTime = File.GetLastWriteTime(updatedFilePath);
-                    DateTime fileToUpdateLastWriteTime = File.GetLastWriteTime(fileToUpdatePath);
-
-                    if (updatedFileLastWriteTime.CompareTo(fileToUpdateLastWriteTime) > 0) // файл требуется обновить
-                    {
-                        string tempFilePath = Path.Combine(folderToUpdate, GenerateTempFileName(fileName));
-                        while (File.Exists(tempFilePath))
-                            tempFilePath = Path.Combine(folderToUpdate, GenerateTempFileName(fileName));// Генерируем новое имя до тех пор, пока оно не будет уникальным
-
-                        File.Copy(fileToUpdatePath, tempFilePath); // Резервная копия файла в папке для обновления
-                        try
-                        {
-                            File.Delete(fileToUpdatePath);
-                        }
-                        catch (IOException)
-                        {
-                            File.Delete(tempFilePath);
-                            FaildToUpdateFileMsgBox(fileName);
-                            Logger.Error("Failed to update the " + fileName + " file.");
-                            continue;
-                        }
-
-                        try
-                        {
-                            File.Copy(updatedFilePath, fileToUpdatePath);
-                        }
-                        catch (IOException)
-                        {
-                            File.Move(tempFilePath, fileToUpdatePath);
-                            FaildToUpdateFileMsgBox(fileName);
-                            Logger.Error("Failed to update the " + fileName + " file.");
-                            continue;
-                        }
-
-                        File.Delete(tempFilePath);
-                        Logger.Info("File " + fileName + " is up to date.");
-                    }
-                }
-                else
-                {
-                    File.Copy(updatedFilePath, fileToUpdatePath);
-                    Logger.Info("File " + fileName + " added to the FolderToUpdate folder.");
-                }
+                UpdateFile(fileName);
                 progressBar.Increment();
             }
         }

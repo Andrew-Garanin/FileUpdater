@@ -1,4 +1,0 @@
-
-2021-12-07 13:45:07.7691 INFO Message: File file2.txt is up to date.
-2021-12-07 14:07:32.5088 ERROR Message: Failed to update the table1.xlsx file.
-2021-12-07 14:07:37.0706 INFO Message: File table1.xlsx is up to date.
