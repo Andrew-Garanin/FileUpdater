@@ -1,7 +1,7 @@
 ﻿
 namespace FileUpdater
 {
-    partial class Form1
+    partial class ProgressBarForm
     {
         /// <summary>
         /// Обязательная переменная конструктора.
@@ -59,7 +59,7 @@ namespace FileUpdater
             this.Controls.Add(this.progressBar);
             this.Name = "Form1";
             this.Text = "Updating Files";
-            this.Shown += new System.EventHandler(this.Form1_Shown);
+            this.Shown += new System.EventHandler(this.ProgressBarForm_Shown);
             this.ResumeLayout(false);
             this.PerformLayout();
 

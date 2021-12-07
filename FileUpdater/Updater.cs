@@ -10,20 +10,20 @@ namespace FileUpdater
     class Updater
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
-        private IniFile MyIni;
+        private IniFile iniFile;
         private string folderToUpdate;
         private string updatedFolder;
         private string[] updatedFiles;
         private int filesCount;
-        private ProgressBar progressBar;
+        private IProgressBar progressBar;
 
-        public Updater(ProgressBar progressBar)
+        public Updater(IProgressBar progressBar)
         {
-            this.MyIni = new IniFile(@"..\..\data\Folders.ini");
+            this.iniFile = new IniFile(@"..\..\data\Folders.ini");
             try
             {
-                this.folderToUpdate = MyIni.Read("FolderToUpdate");
-                this.updatedFolder = MyIni.Read("UpdatedFolder");
+                this.folderToUpdate = iniFile.Read("FolderToUpdate");
+                this.updatedFolder = iniFile.Read("UpdatedFolder");
                 this.updatedFiles = Directory.GetFiles(updatedFolder);
             }
             catch (DirectoryNotFoundException)
@@ -36,34 +36,30 @@ namespace FileUpdater
             }
             this.filesCount = updatedFiles.Length;
             this.progressBar = progressBar;
+            this.progressBar.Inicialize(this.filesCount);
         }
 
-        public int getFilesCout()
-        {
-            return filesCount;
-        }
-
-        private bool isApplication(string fileName)
+        private bool IsApplication(string fileName)
         {
             if (Path.GetExtension(fileName).Equals(".exe"))
                 return true;
             return false;
         }
 
-        private bool isProcessExist(string processName)
+        private bool IsProcessExist(string processName)
         {
             if (Process.GetProcesses().Any(p => p.ProcessName == processName))
                 return true;
             return false;
         }
 
-        private string generateTempFileName(string fileName)
+        private string GenerateTempFileName(string fileName)
         {
             string fileExtension = Path.GetExtension(fileName);
             return String.Format(@"{0}" + fileExtension, System.Guid.NewGuid());
         }
 
-        private void closeProcess(string processName)
+        private void CloseProcess(string processName)
         {
             Process[] processes = Process.GetProcessesByName(processName);
             bool wasClosed = false;
@@ -80,7 +76,7 @@ namespace FileUpdater
                 Logger.Error("Faild to close the " + processName + " application.");
         }
 
-        private void faildToUpdateFileMsgBox(string fileName)
+        private void FaildToUpdateFileMsgBox(string fileName)
         {
             MessageBox.Show("Failed to update the " + fileName + " file.",
                                "Updating files",
@@ -88,7 +84,7 @@ namespace FileUpdater
                                MessageBoxIcon.Error);
         }
 
-        public void Updating()
+        public void UpdateFiles()
         {
             if (filesCount == 0)
             {
@@ -107,11 +103,11 @@ namespace FileUpdater
 
                 if (File.Exists(fileToUpdatePath))
                 {
-                    if (isApplication(fileName))
+                    if (IsApplication(fileName))
                     {
                         string processName = Path.GetFileNameWithoutExtension(fileName);
-                        if (isProcessExist(processName))
-                            closeProcess(processName);
+                        if (IsProcessExist(processName))
+                            CloseProcess(processName);
                     }
 
                     DateTime updatedFileLastWriteTime = File.GetLastWriteTime(updatedFilePath);
@@ -119,9 +115,9 @@ namespace FileUpdater
 
                     if (updatedFileLastWriteTime.CompareTo(fileToUpdateLastWriteTime) > 0) // файл требуется обновить
                     {
-                        string tempFilePath = Path.Combine(folderToUpdate, generateTempFileName(fileName));
+                        string tempFilePath = Path.Combine(folderToUpdate, GenerateTempFileName(fileName));
                         while (File.Exists(tempFilePath))
-                            tempFilePath = Path.Combine(folderToUpdate, generateTempFileName(fileName));// Генерируем новое имя до тех пор, пока оно не будет уникальным
+                            tempFilePath = Path.Combine(folderToUpdate, GenerateTempFileName(fileName));// Генерируем новое имя до тех пор, пока оно не будет уникальным
 
                         File.Copy(fileToUpdatePath, tempFilePath); // Резервная копия файла в папке для обновления
                         try
@@ -131,7 +127,7 @@ namespace FileUpdater
                         catch (IOException)
                         {
                             File.Delete(tempFilePath);
-                            faildToUpdateFileMsgBox(fileName);
+                            FaildToUpdateFileMsgBox(fileName);
                             Logger.Error("Failed to update the " + fileName + " file.");
                             continue;
                         }
@@ -143,7 +139,7 @@ namespace FileUpdater
                         catch (IOException)
                         {
                             File.Move(tempFilePath, fileToUpdatePath);
-                            faildToUpdateFileMsgBox(fileName);
+                            FaildToUpdateFileMsgBox(fileName);
                             Logger.Error("Failed to update the " + fileName + " file.");
                             continue;
                         }
@@ -157,7 +153,7 @@ namespace FileUpdater
                     File.Copy(updatedFilePath, fileToUpdatePath);
                     Logger.Info("File " + fileName + " added to the FolderToUpdate folder.");
                 }
-                progressBar.Value++;
+                progressBar.Increment();
             }
         }
     }
