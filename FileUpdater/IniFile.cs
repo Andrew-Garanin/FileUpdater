@@ -13,9 +13,9 @@ namespace FileUpdater
         [DllImport("kernel32", CharSet = CharSet.Unicode)]
         static extern int GetPrivateProfileString(string Section, string Key, string Default, StringBuilder RetVal, int Size, string FilePath);
 
-        public IniFile(string IniPath = null)
+        public IniFile(string IniPath)
         {
-            Path = new FileInfo(IniPath ?? EXE + ".ini").FullName;
+            Path = new FileInfo(IniPath).FullName;
         }
 
         public string Read(string Key, string Section = null)

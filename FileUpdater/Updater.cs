@@ -16,7 +16,7 @@ namespace FileUpdater
 
         public Updater(IProgressBar progressBar)
         {
-            this.iniFile = new IniFile(@"..\..\configuration\FoldersConfiguration.ini");
+            this.iniFile = new IniFile("FoldersConfiguration.ini");
             try
             {
                 this.folderToUpdate = iniFile.Read("FolderToUpdate");
