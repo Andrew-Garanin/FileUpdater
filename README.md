@@ -12,12 +12,19 @@ Desktop приложение, которое позволяет обновлят
 если запущено, то отправить ему Close и попытаться закрыть);
 - если даты изменения совпадают, то ничего не делать.
 
-Расположение файла конфигурации: ```FileUpdater/FileUpdater/configuration/FoldersConfiguration.ini```
+```Файл конфигурации должен называться 'FoldersConfiguration'.```
+
+Пример файла конфигурации:
+
+```
+
+[FileUpdater]
+FolderToUpdate="D:\Test\FolderToUpdate"
+UpdatedFolder="D:\Test\UpdatedFolder"
+```
 
 Приложение включает в себя использование сторонней библиотеки ```NLog for .NET Framework```, которая упрощает выполнение логирования.
 
 Файл ```FileUpdater/FileUpdater/NLog.config``` отвечает за настройку логирования.
-
-Расположение лог файла: ```FileUpdater/FileUpdater/LogFile.txt```.
 
 Более подробно о библиотеке и настройке файла логирования можно почитать тут: [NLog for .NET Framework](https://github.com/nlog/nlog/wiki/Tutorial).
